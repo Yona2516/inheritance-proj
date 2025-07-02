@@ -197,6 +197,9 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on http://145.223.98.156:${PORT}`);
+const HOST = '145.223.98.156'; // Your server's public IP
+
+app.listen(PORT, HOST, () => {
+  console.log(`✅ Server running on http://${HOST}:${PORT}`);
+  console.log(`🔗 Local access: http://localhost:${PORT}`);
 });
