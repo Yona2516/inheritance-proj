@@ -4,47 +4,27 @@ const cors = require('cors');
 const path = require('path');
 const db = require('./db');
 const dotenv = require('dotenv');
-// const Beem = require('beem'); // Uncomment if using Beem SMS SDK
 
 dotenv.config();
 const app = express();
 
+// Enhanced CORS configuration
+const corsOptions = {
+  origin: true, // Allow all origins (adjust in production)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests
+
 // Middleware
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://145.223.98.156',
-  'http://yourfrontenddomain.com',
-  'https://yourfrontenddomain.com'
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `CORS policy: ${origin} not allowed`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Handle preflight
-app.options('*', cors());
-
-
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
-app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
+// Serve static files with absolute paths
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
@@ -109,8 +89,8 @@ app.post('/api/register', upload.single('will'), async (req, res) => {
   }
 });
 
-// Update beneficiary
-app.put('/api/update-beneficiary/:id', async (req, res) => {
+// Update beneficiary with parameter validation
+app.put('/api/update-beneficiary/:id(\\d+)', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, age, phone, relation, address, username, password } = req.body;
@@ -137,8 +117,8 @@ app.put('/api/update-beneficiary/:id', async (req, res) => {
   }
 });
 
-// Delete beneficiary
-app.delete('/api/delete-beneficiary/:id', async (req, res) => {
+// Delete beneficiary with parameter validation
+app.delete('/api/delete-beneficiary/:id(\\d+)', async (req, res) => {
   try {
     const { id } = req.params;
     const [result] = await db.query('DELETE FROM beneficiaries WHERE id = ?', [id]);
@@ -169,7 +149,6 @@ app.post('/api/beneficiary-login', async (req, res) => {
 
     if (results.length > 0) {
       const user = results[0];
-      // Consider removing password from response
       const { password: _, ...userWithoutPassword } = user;
       res.json({ success: true, user: userWithoutPassword });
     } else {
@@ -189,18 +168,6 @@ app.post('/api/beneficiary-login', async (req, res) => {
 app.post('/api/notify', async (req, res) => {
   try {
     const { phone, message } = req.body;
-
-    // Uncomment and configure if using Beem SDK
-    /*
-    const response = await beem.sendSMS({
-      to: phone,
-      message,
-      from: "INHERITANCE"
-    });
-    res.json({ success: true, response });
-    */
-
-    // Mock implementation
     console.log(`📨 Sending SMS to ${phone}: "${message}"`);
     res.json({ success: true, message: 'Mock SMS sent (no real API call).' });
   } catch (err) {
@@ -225,7 +192,7 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-const HOST = '145.223.98.156'; // Your server's public IP
+const HOST = '145.223.98.156';
 
 app.listen(PORT, HOST, () => {
   console.log(`✅ Server running on http://${HOST}:${PORT}`);
