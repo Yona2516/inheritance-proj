@@ -13,6 +13,8 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://145.223.98.156',
+  'http://yourfrontenddomain.com',
+  'https://yourfrontenddomain.com'
 ];
 
 app.use(cors({
