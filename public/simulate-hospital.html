@@ -61,7 +61,7 @@
 
     async function loadBeneficiaries() {
       try {
-        const res = await fetch('http://localhost:3000/api/beneficiaries/simple');
+        const res = await fetch('http://145.223.98.156/api/beneficiaries/simple');
         beneficiaries = await res.json();
         table.innerHTML = '';
 
@@ -88,7 +88,7 @@
       for (let b of beneficiaries) {
         const msg = `Hello ${b.username}, your password is: ${b.password}`;
         try {
-          await fetch('http://localhost:3000/api/notify', {
+          await fetch('http://145.223.98.156/api/notify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone: b.phone, message: msg })

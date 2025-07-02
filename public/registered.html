@@ -139,7 +139,7 @@
 
   async function loadBeneficiaries() {
     try {
-      const res = await fetch('http://localhost:3000/api/beneficiaries');
+      const res = await fetch('http://145.223.98.156/api/beneficiaries');
       const beneficiaries = await res.json();
 
       const tbody = document.querySelector('#beneficiariesTable');
@@ -173,7 +173,7 @@
 
   function deleteBeneficiary(id) {
     if (confirm('Are you sure you want to delete this record?')) {
-      fetch(`http://localhost:3000/api/delete-beneficiary/${id}`, {
+      fetch(`http://145.223.98.156/api/delete-beneficiary/${id}`, {
         method: 'DELETE'
       })
       .then(res => res.json())
