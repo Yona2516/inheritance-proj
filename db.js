@@ -3,9 +3,9 @@ require('dotenv').config();
 
 // Create connection pool for better performance
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || '127.0.0.1',
-  user: process.env.DB_USER || 'inheritance_user',
-  password: process.env.DB_PASSWORD || '',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'inheritance',
+  password: process.env.DB_PASSWORD || '@Eliakimu122',
   database: process.env.DB_NAME || 'inheritance',
   waitForConnections: true,
   connectionLimit: 10,
