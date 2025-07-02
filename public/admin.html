@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inheritance Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f7f9fb;
+    }
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: #1a237e;
+      color: white;
+      padding: 20px;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar h2 {
+      margin: 0 0 20px;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      background: #3949ab;
+    }
+    .sidebar a:hover {
+      background: #5c6bc0;
+    }
+    .main {
+      flex-grow: 1;
+      padding: 30px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label { font-weight: 600; display: block; margin-top: 12px; }
+    input, textarea {
+      width: 100%; padding: 10px; margin-top: 6px;
+      border-radius: 6px; border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff; color: #fff;
+      border: none; padding: 10px 20px; border-radius: 6px;
+      margin-top: 20px; cursor: pointer;
+    }
+    button:hover { background-color: #0056b3; }
+    table {
+      width: 100%; border-collapse: collapse;
+      margin-top: 40px;
+    }
+    th, td {
+      padding: 10px; border: 1px solid #ddd; text-align: center;
+    }
+    th { background-color: #f0f0f0; }
+    .edit-btn {
+      background: orange; color: white;
+      border: none; padding: 5px 10px;
+      border-radius: 4px; cursor: pointer;
+      margin-right: 5px;
+    }
+    .delete-btn {
+      background: crimson; color: white;
+      border: none; padding: 5px 10px;
+      border-radius: 4px; cursor: pointer;
+    }
+    .logout-btn {
+      margin-top: auto;
+      background: red;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="sidebar">
+      <h2>Will Registration</h2>
+      <a href="admin.html">Home</a>
+      <a href="registered.html">Registered</a>
+      <a href="about.html">About</a>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+    <div class="main">
+      <div class="container">
+        <form id="beneficiaryForm" enctype="multipart/form-data">
+          <label>Full Name:</label>
+          <input type="text" name="name" required>
+
+          <label>Age:</label>
+          <input type="number" name="age" required>
+
+          <label>Phone Number:</label>
+          <input type="text" name="phone" required>
+
+          <label>Relation:</label>
+          <input type="text" name="relation" required>
+
+          <label>Address:</label>
+          <textarea name="address" rows="3" required></textarea>
+
+          <label>Upload Will (PDF):</label>
+          <input type="file" name="will" accept="application/pdf">
+
+          <label>Login Username:</label>
+          <input type="text" name="username" required>
+
+          <label>Login Password:</label>
+          <input type="password" name="password" required>
+
+          <input type="hidden" name="id" id="beneficiary-id">
+          <button type="submit">Register Beneficiary</button>
+        </form>
+
+        <div id="message" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+<script>
+
+  const form = document.getElementById('beneficiaryForm');  
+const messageBox = document.getElementById('message');  
+
+form.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const id = document.getElementById('beneficiary-id').value;
+
+  let response;
+  if (id) {
+    // Edit mode
+    const payload = {
+      id: id,
+      name: formData.get("name"),
+      age: formData.get("age"),
+      phone: formData.get("phone"),
+      relation: formData.get("relation"),
+      address: formData.get("address"),
+      username: formData.get("username"),
+      password: formData.get("password"),
+    };
+
+    response = await fetch('http://localhost:3000/api/update-beneficiary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } else {
+    // Register new beneficiary
+    response = await fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      body: formData
+    });
+  }
+
+  const result = await response.json();
+  if (result.success) {
+    messageBox.textContent = result.message;
+    messageBox.style.color = 'green';
+    form.reset();
+    document.getElementById('beneficiary-id').value = '';
+    // Optionally redirect
+    window.location.href = 'registered.html';
+  } else {
+    messageBox.textContent = result.message || 'Error occurred.';
+    messageBox.style.color = 'red';
+  }
+});
+  function logout() {
+    window.location.href = 'index.html';
+  }
+</script>
+</body>
+</html>

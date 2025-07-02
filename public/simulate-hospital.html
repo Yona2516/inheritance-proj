@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hospital Simulation - Notify Beneficiaries</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f5f7fa; }
+    h2, h3 { text-align: center; margin-bottom: 10px; }
+    h3 { color: #004080; margin-top: 30px; }
+    table {
+      width: 100%; border-collapse: collapse;
+      background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-radius: 8px; overflow: hidden;
+    }
+    th { padding: 12px; background: #007bff; color: white; }
+    td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+    button {
+      padding: 10px 20px; background: #28a745;
+      color: white; border: none; border-radius: 6px;
+      font-size: 16px; cursor: pointer; display: block; margin: 20px auto;
+    }
+    button:hover { background: #218838; }
+    .logout-btn {
+      margin: 20px auto;
+      background: red;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h2>Hospital API</h2>
+  <h3>National ID: <span id="adminNationalId">[Not Set]</span></h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Phone Number</th>
+        <th>Password</th>
+      </tr>
+    </thead>
+    <tbody id="beneficiaryTable"></tbody>
+  </table>
+
+  <button onclick="notifyAll()">Notify All</button>
+  <!-- <button class="logout-btn" onclick="logout()">Logout</button> -->
+
+  <script>
+    const table = document.getElementById('beneficiaryTable');
+    let beneficiaries = [];
+
+    // Load and display National ID from localStorage
+    const nationalId = localStorage.getItem('adminName');
+    document.getElementById('adminNationalId').textContent = nationalId || '[Not Set]';
+
+    async function loadBeneficiaries() {
+      try {
+        const res = await fetch('http://localhost:3000/api/beneficiaries/simple');
+        beneficiaries = await res.json();
+        table.innerHTML = '';
+
+        beneficiaries.forEach(b => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${b.username}</td>
+            <td>${b.phone}</td>
+            <td>${b.password}</td>
+          `;
+          table.appendChild(row);
+        });
+      } catch (err) {
+        alert('Failed to load data');
+        console.error(err);
+      }
+    }
+
+    async function notifyAll() {
+      if (beneficiaries.length === 0) {
+        alert("No beneficiaries to notify.");
+        return;
+      }
+      for (let b of beneficiaries) {
+        const msg = `Hello ${b.username}, your password is: ${b.password}`;
+        try {
+          await fetch('http://localhost:3000/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: b.phone, message: msg })
+          });
+        } catch (err) {
+          console.error(`Notify failed for ${b.phone}`, err);
+        }
+      }
+      alert("✅ Notifications sent.");
+    }
+
+    // function logout() {
+    //   localStorage.removeItem('adminName');
+    //   window.location.href = 'index.html';
+    // }
+
+    loadBeneficiaries();
+  </script>
+</body>
+</html>

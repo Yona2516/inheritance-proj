@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Beneficiary Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      margin-bottom: 30px;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .logout-btn {
+      background: #dc3545;
+      margin-top: 20px;
+    }
+    #details {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+      font-size: 15px;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 20px;
+      display: none;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login Form -->
+    <div id="loginForm">
+      <h2>Beneficiary Login</h2>
+      <input id="username" placeholder="Username" />
+      <input id="password" type="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <div id="errorMsg" class="error"></div>
+    </div>
+
+    <!-- User Info -->
+    <div id="info" style="display: none;">
+      <h2>Welcome, <span id="userName"></span></h2>
+      <div id="details"></div>
+
+      <!-- Confirmation before PDF display -->
+      <div id="pdfConfirmSection" style="display: none; margin-top: 20px;">
+        <label for="confirmInput">Please Enter Death Certificate Entry NO:</label>
+        <input id="confirmInput" placeholder="Enter Entry NO" />
+        <button onclick="confirmAccess()">Confirm</button>
+        <div id="confirmError" class="error"></div>
+      </div>
+
+      <iframe id="pdfViewer"></iframe>
+
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    let loggedInUser = null;
+
+    async function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+      const pdfViewer = document.getElementById("pdfViewer");
+
+      errorMsg.textContent = "";
+
+      if (!username || !password) {
+        errorMsg.textContent = "Please enter both username and password.";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:3000/api/beneficiary-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById("loginForm").style.display = "none";
+          document.getElementById("info").style.display = "block";
+
+          document.getElementById("userName").textContent = data.user.name;
+          document.getElementById("details").innerHTML = `
+            <strong>Name:</strong> ${data.user.name}<br>
+            <strong>Age:</strong> ${data.user.age}<br>
+            <strong>Phone:</strong> ${data.user.phone}<br>
+            <strong>Relation:</strong> ${data.user.relation}<br>
+            <strong>Address:</strong> ${data.user.address}
+          `;
+
+          loggedInUser = data.user;
+          pdfViewer.style.display = "none";
+          pdfViewer.src = "";
+
+          if (loggedInUser.will_pdf) {
+            document.getElementById("pdfConfirmSection").style.display = "block";
+          } else {
+            document.getElementById("pdfConfirmSection").style.display = "none";
+          }
+        } else {
+          errorMsg.textContent = "Login failed. Invalid credentials.";
+        }
+      } catch (error) {
+        console.error(error);
+        errorMsg.textContent = "Server error. Try again.";
+      }
+    }
+
+    function confirmAccess() {
+      const input = document.getElementById("confirmInput").value.trim();
+      const confirmError = document.getElementById("confirmError");
+      const pdfViewer = document.getElementById("pdfViewer");
+
+      if (input === loggedInUser.username) {
+        const pdfUrl = `http://localhost:3000/uploads/${loggedInUser.will_pdf}`;
+        pdfViewer.src = pdfUrl;
+        pdfViewer.style.display = "block";
+        confirmError.textContent = "";
+      } else {
+        pdfViewer.src = "";
+        pdfViewer.style.display = "none";
+        confirmError.textContent = "Incorrect Entry NO. Please try again.";
+      }
+    }
+
+    function logout() {
+      document.getElementById("loginForm").style.display = "block";
+      document.getElementById("info").style.display = "none";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("errorMsg").textContent = "";
+      document.getElementById("details").innerHTML = "";
+      document.getElementById("pdfViewer").src = "";
+      document.getElementById("pdfViewer").style.display = "none";
+      document.getElementById("pdfConfirmSection").style.display = "none";
+      document.getElementById("confirmInput").value = "";
+      document.getElementById("confirmError").textContent = "";
+      loggedInUser = null;
+    }
+  </script>
+</body>
+</html>

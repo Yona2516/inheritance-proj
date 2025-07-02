@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User System - Login/Register</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #eef2f7;
+    }
+
+    .header {
+      background-color: #004080;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .main {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 500px;
+      margin: 0 30px;
+      padding: 30px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .panel.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      color: #004080;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #004080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #003060;
+    }
+
+    .message {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .message.success {
+      color: green;
+    }
+
+    .message.error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    Welcome to URITHI Portal
+  </div>
+
+  <div class="main">
+    <!-- Registration Panel -->
+    <div class="panel" id="registerPanel">
+      <h2>Register</h2>
+      <div class="form-group">
+        <label>National ID Number</label>
+        <input type="text" id="regNationalId">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail">
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="regUsername">
+      </div>
+      <div class="form-group">
+        <label>Tribe</label>
+        <input type="text" id="regTribe">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="regPassword">
+      </div>
+      <button onclick="registerUser()">Sign Up</button>
+      <div id="regMessage" class="message"></div>
+    </div>
+
+    <!-- Login Panel -->
+    <div class="panel" id="loginPanel">
+      <h2>Login</h2>
+      <div class="form-group">
+        <label>National ID Number</label>
+        <input type="text" id="loginNationalId">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword">
+      </div>
+      <button onclick="loginUser()">Login</button>
+      <div id="loginMessage" class="message"></div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("registerPanel").classList.add("active");
+      setTimeout(() => {
+        document.getElementById("loginPanel").classList.add("active");
+      }, 300);
+    });
+
+    function getUsers() {
+      const users = localStorage.getItem('users');
+      return users ? JSON.parse(users) : [];
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    function registerUser() {
+      const nationalId = document.getElementById('regNationalId').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const username = document.getElementById('regUsername').value.trim();
+      const tribe = document.getElementById('regTribe').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const messageEl = document.getElementById('regMessage');
+
+      if (!nationalId || !email || !username || !tribe || !password) {
+        messageEl.textContent = 'Please fill all fields.';
+        messageEl.className = 'message error';
+        return;
+      }
+
+      const users = getUsers();
+      if (users.some(u => u.nationalId === nationalId)) {
+        messageEl.textContent = 'User already exists.';
+        messageEl.className = 'message error';
+        return;
+      }
+
+      users.push({ nationalId, email, username, tribe, password });
+      saveUsers(users);
+
+      messageEl.textContent = 'Registered successfully!';
+      messageEl.className = 'message success';
+
+      document.getElementById('regNationalId').value = '';
+      document.getElementById('regEmail').value = '';
+      document.getElementById('regUsername').value = '';
+      document.getElementById('regTribe').value = '';
+      document.getElementById('regPassword').value = '';
+    }
+
+    function loginUser() {
+      const nationalId = document.getElementById('loginNationalId').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const messageEl = document.getElementById('loginMessage');
+
+      const users = getUsers();
+      const user = users.find(u => u.nationalId === nationalId && u.password === password);
+
+      if (user) {
+        localStorage.setItem('adminName', user.nationalId); // Storing National ID
+
+        messageEl.textContent = 'Login successful. Redirecting...';
+        messageEl.className = 'message success';
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 1000);
+      } else {
+        messageEl.textContent = 'Invalid National ID or password.';
+        messageEl.className = 'message error';
+      }
+    }
+  </script>
+</body>
+</html>

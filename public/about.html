@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>About - Inheritance Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f7f9fb;
+    }
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: #1a237e;
+      color: white;
+      padding: 20px;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar h2 {
+      margin-bottom: 20px;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      background: #3949ab;
+    }
+    .sidebar a:hover {
+      background: #5c6bc0;
+    }
+    .logout-btn {
+      margin-top: auto;
+      background: red;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+    .main {
+      flex-grow: 1;
+      padding: 30px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h3 {
+      margin-top: 0;
+      color: #1a237e;
+    }
+    p {
+      line-height: 1.6;
+      color: #333;
+    }
+    ul {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="sidebar">
+      <h2>URITHI PORTAL</h2>
+      <a href="admin.html">Home</a>
+      <a href="registered.html">Registered</a>
+      <a href="about.html">About</a>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+    <div class="main">
+      <div class="container">
+        <h3>About the System</h3>
+        <p>
+          This Inheritance Management System is designed to securely manage and store will documents and beneficiary details.
+          It allows administrators to register beneficiaries, upload will documents in PDF format, and manage beneficiary data.
+        </p>
+
+        <p>The main features of the system include:</p>
+        <ul>
+          <li>Registering beneficiaries with personal and contact information</li>
+          <li>Uploading and storing will documents in PDF format</li>
+          <li>Viewing a list of all registered beneficiaries</li>
+          <li>Editing or deleting beneficiary records</li>
+          <li>Sending SMS notifications (via Beem integration)</li>
+        </ul>
+
+        <p>
+          The system ensures that data is stored safely and provides a user-friendly interface for managing inheritance-related information. It is built using Node.js for the server, MySQL for the database, and plain HTML/CSS for the frontend.
+        </p>
+
+        <p>
+          For more details or technical support, please contact the system developer or administrator.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
