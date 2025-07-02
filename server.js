@@ -8,21 +8,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
-// Enhanced CORS configuration
-const corsOptions = {
-  origin: true, // Allow all origins (adjust in production)
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight requests
-
 // Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files with absolute paths
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -89,8 +80,8 @@ app.post('/api/register', upload.single('will'), async (req, res) => {
   }
 });
 
-// Update beneficiary with parameter validation
-app.put('/api/update-beneficiary/:id(\\d+)', async (req, res) => {
+// Update beneficiary - FIXED ROUTE PATH
+app.put('/api/update-beneficiary/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, age, phone, relation, address, username, password } = req.body;
@@ -117,8 +108,8 @@ app.put('/api/update-beneficiary/:id(\\d+)', async (req, res) => {
   }
 });
 
-// Delete beneficiary with parameter validation
-app.delete('/api/delete-beneficiary/:id(\\d+)', async (req, res) => {
+// Delete beneficiary - FIXED ROUTE PATH
+app.delete('/api/delete-beneficiary/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const [result] = await db.query('DELETE FROM beneficiaries WHERE id = ?', [id]);
@@ -164,7 +155,7 @@ app.post('/api/beneficiary-login', async (req, res) => {
   }
 });
 
-// Notify via SMS (mock or real Beem API)
+// Notify via SMS
 app.post('/api/notify', async (req, res) => {
   try {
     const { phone, message } = req.body;
@@ -192,9 +183,6 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-const HOST = '145.223.98.156';
-
-app.listen(PORT, HOST, () => {
-  console.log(`✅ Server running on http://${HOST}:${PORT}`);
-  console.log(`🔗 Local access: http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
