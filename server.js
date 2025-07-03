@@ -8,25 +8,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
-// Universal CORS configuration for all routes
-const allowedOrigins = [
-  'http://145.223.98.156:3000', // Your frontend
-  'http://localhost:3000'       // Local development
-];
-
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Handle preflight requests for all routes
-app.options('*', cors());
-
-// Standard middleware
+// Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -42,7 +29,7 @@ const upload = multer({ storage });
 // ============ ROUTES ============ //
 
 // Get all beneficiaries
-app.get('/api/beneficiaries', async (req, res) => {
+app.get(`${':3000'}/api/beneficiaries`, async (req, res) => {
   try {
     const [results] = await db.query('SELECT * FROM beneficiaries ORDER BY id DESC');
     res.json(results);
@@ -53,7 +40,7 @@ app.get('/api/beneficiaries', async (req, res) => {
 });
 
 // Return only username, phone, and password
-app.get('/api/beneficiaries/simple', async (req, res) => {
+app.get(`${':3000'}/api/beneficiaries/simple`, async (req, res) => {
   try {
     const [results] = await db.query(
       'SELECT username, phone, password FROM beneficiaries ORDER BY id DESC'
@@ -66,7 +53,7 @@ app.get('/api/beneficiaries/simple', async (req, res) => {
 });
 
 // Register new beneficiary with PDF upload
-app.post('/api/register', upload.single('will'), async (req, res) => {
+app.post(`${':3000'}/api/register`, upload.single('will'), async (req, res) => {
   try {
     const { name, age, phone, relation, address, username, password } = req.body;
     const pdfPath = req.file?.filename || '';
@@ -93,7 +80,7 @@ app.post('/api/register', upload.single('will'), async (req, res) => {
   }
 });
 
-// Update beneficiary
+// Update beneficiary - FIXED ROUTE PATH
 app.put('/api/update-beneficiary/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -121,7 +108,7 @@ app.put('/api/update-beneficiary/:id', async (req, res) => {
   }
 });
 
-// Delete beneficiary
+// Delete beneficiary - FIXED ROUTE PATH
 app.delete('/api/delete-beneficiary/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -143,7 +130,7 @@ app.delete('/api/delete-beneficiary/:id', async (req, res) => {
 });
 
 // Beneficiary login
-app.post('/api/beneficiary-login', async (req, res) => {
+app.post(`${':3000'}/api/beneficiary-login`, async (req, res) => {
   try {
     const { username, password } = req.body;
     const [results] = await db.query(
@@ -196,7 +183,6 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on http://145.223.98.156:${PORT}`);
-  console.log(`🔗 Local access: http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
