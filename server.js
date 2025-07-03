@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const db = require('./db');
 const dotenv = require('dotenv');
-// const Beem = require('beem'); // Uncomment if using Beem SMS SDK
+const beem = require('beem'); // Uncomment if using Beem SMS SDK
 
 dotenv.config();
 const app = express();
