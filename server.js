@@ -186,13 +186,13 @@ app.post("/api/notify", async (req, res) => {
 
     // Uncomment and configure if using Beem SDK
 
-    const response = await beem.sendSMS({
-      to: phone,
-      message,
-      from: "INHERITANCE",
-    });
-    res.json({ success: true, response });
-    console.log(response);
+    // const response = await beem.sendSMS({
+    //   to: phone,
+    //   message,
+    //   from: "INHERITANCE",
+    // });
+    // res.json({ success: true, response });
+    // console.log(response);
 
     function send_sms() {
       axios
@@ -227,8 +227,8 @@ app.post("/api/notify", async (req, res) => {
     send_sms();
 
     // Mock implementation
-    console.log(`📨 Sending SMS to ${phone}: "${message}"`);
-    res.json({ success: true, message: "Mock SMS sent (no real API call)." });
+    // console.log(`📨 Sending SMS to ${phone}: "${message}"`);
+    // res.json({ success: true, message: "Mock SMS sent (no real API call)." });
   } catch (err) {
     console.error("SMS Error:", err);
     res.status(500).json({
