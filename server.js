@@ -29,7 +29,7 @@ const upload = multer({ storage });
 // ============ ROUTES ============ //
 
 // Get all beneficiaries
-app.get(`${':3000'}/api/beneficiaries`, async (req, res) => {
+app.get(`${":3000"}/api/beneficiaries`, async (req, res) => {
   try {
     const [results] = await db.query('SELECT * FROM beneficiaries ORDER BY id DESC');
     res.json(results);
@@ -40,7 +40,7 @@ app.get(`${':3000'}/api/beneficiaries`, async (req, res) => {
 });
 
 // Return only username, phone, and password
-app.get(`${':3000'}/api/beneficiaries/simple`, async (req, res) => {
+app.get('/api/beneficiaries/simple', async (req, res) => {
   try {
     const [results] = await db.query(
       'SELECT username, phone, password FROM beneficiaries ORDER BY id DESC'
@@ -53,7 +53,7 @@ app.get(`${':3000'}/api/beneficiaries/simple`, async (req, res) => {
 });
 
 // Register new beneficiary with PDF upload
-app.post(`${':3000'}/api/register`, upload.single('will'), async (req, res) => {
+app.post('/api/register', upload.single('will'), async (req, res) => {
   try {
     const { name, age, phone, relation, address, username, password } = req.body;
     const pdfPath = req.file?.filename || '';
@@ -130,7 +130,7 @@ app.delete('/api/delete-beneficiary/:id', async (req, res) => {
 });
 
 // Beneficiary login
-app.post(`${':3000'}/api/beneficiary-login`, async (req, res) => {
+app.post('/api/beneficiary-login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const [results] = await db.query(
