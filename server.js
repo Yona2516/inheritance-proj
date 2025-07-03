@@ -7,21 +7,17 @@ const dotenv = require("dotenv");
 const Beem = require("beem"); // Uncomment and ensure Beem is installed
 
 // Initialize Beem with your credentials
-const beem = new Beem({
-  api_key: "829d4e9679d4498b", // Replace with your actual API key
-  secret_key:
-    "OTBhM2QxNTQ5NzQyZjgzN2NjMTk1ZTY1MGMxMjYzOTliMzZjZDU1MjUwYTBlZThjMjEwNmJmYTFjZjM1NzcxYw==", // Replace with your actual secret key
-});
+// Beem Africa Configuration
 
 const axios = require("axios");
 const https = require("https");
 var btoa = require("btoa");
 
-// const api_key = "829d4e9679d4498b";
-// const secret_key =
-//   "OTBhM2QxNTQ5NzQyZjgzN2NjMTk1ZTY1MGMxMjYzOTliMzZjZDU1MjUwYTBlZThjMjEwNmJmYTFjZjM1NzcxYw==";
-// const content_type = "application/json";
-// const source_addr = "INHERITANCE System";
+const api_key = "829d4e9679d4498b";
+const secret_key =
+  "OTBhM2QxNTQ5NzQyZjgzN2NjMTk1ZTY1MGMxMjYzOTliMzZjZDU1MjUwYTBlZThjMjEwNmJmYTFjZjM1NzcxYw==";
+const content_type = "application/json";
+const source_addr = "INHERITANCE System";
 
 dotenv.config();
 const app = express();
@@ -193,25 +189,47 @@ app.post("/api/notify", async (req, res) => {
   try {
     console.log(`📨 Attempting to send SMS to ${phone}: "${message}"`);
 
-    // Send SMS using Beem Africa
-    const response = await beem.sendSMS({
-      to: phone, // Phone number in international format (e.g., +255712345678)
-      message: message, // Your message content
-      from: "INHERITANCE", // Your sender ID (must be approved by Beem)
-    });
+    // Ensure phone number is in correct format (remove + if present)
+    const cleanPhone = phone.replace(/^\+/, "");
 
-    console.log("✅ SMS sent successfully:", response);
+    // Send SMS using Beem Africa API
+    const response = await axios.post(
+      "https://apisms.beem.africa/v1/send",
+      {
+        source_addr: source_addr,
+        schedule_time: "",
+        encoding: 0,
+        message: message,
+        recipients: [
+          {
+            recipient_id: 1,
+            dest_addr: cleanPhone, // Phone number without + prefix
+          },
+        ],
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Basic " + btoa(api_key + ":" + secret_key),
+        },
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false,
+        }),
+      }
+    );
+
+    console.log("✅ SMS sent successfully:", response.data);
     res.json({
       success: true,
       message: "SMS sent successfully",
-      response: response,
+      response: response.data,
     });
   } catch (error) {
-    console.error("❌ SMS Error:", error);
+    console.error("❌ SMS Error:", error.response?.data || error.message);
     res.status(500).json({
       success: false,
-      error: error.message || "Failed to send SMS",
-      details: error,
+      error: error.response?.data || error.message,
+      details: error.response?.data || "Failed to send SMS",
     });
   }
 });
