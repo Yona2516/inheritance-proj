@@ -8,12 +8,25 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
-// Middleware
-app.use(cors());
+// Universal CORS configuration for all routes
+const allowedOrigins = [
+  'http://145.223.98.156:3000', // Your frontend
+  'http://localhost:3000'       // Local development
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Handle preflight requests for all routes
+app.options('*', cors());
+
+// Standard middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -80,7 +93,7 @@ app.post('/api/register', upload.single('will'), async (req, res) => {
   }
 });
 
-// Update beneficiary - FIXED ROUTE PATH
+// Update beneficiary
 app.put('/api/update-beneficiary/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -108,7 +121,7 @@ app.put('/api/update-beneficiary/:id', async (req, res) => {
   }
 });
 
-// Delete beneficiary - FIXED ROUTE PATH
+// Delete beneficiary
 app.delete('/api/delete-beneficiary/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -183,6 +196,7 @@ app.use((err, req, res, next) => {
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server running on http://145.223.98.156:${PORT}`);
+  console.log(`🔗 Local access: http://localhost:${PORT}`);
 });
