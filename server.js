@@ -29,7 +29,7 @@ const upload = multer({ storage });
 // ============ ROUTES ============ //
 
 // ✅ Get all beneficiaries
-app.get(':3000/api/beneficiaries', (req, res) => {
+app.get('/api/beneficiaries', (req, res) => {
   const sql = 'SELECT * FROM beneficiaries ORDER BY id DESC';
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
