@@ -13,7 +13,7 @@ const api_key = "829d4e9679d4498b";
 const secret_key =
   "OTBhM2QxNTQ5NzQyZjgzN2NjMTk1ZTY1MGMxMjYzOTliMzZjZDU1MjUwYTBlZThjMjEwNmJmYTFjZjM1NzcxYw==";
 const content_type = "application/json";
-const source_addr = "INHERITANCE System";
+const source_addr = "Urithi";
 
 dotenv.config();
 const app = express();
