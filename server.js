@@ -195,37 +195,37 @@ app.post("/api/notify", async (req, res) => {
     */
     console.log(phone, message);
 
-    // function send_sms() {
-    //   axios
-    //     .post(
-    //       "https://apisms.beem.africa/v1/send",
-    //       {
-    //         source_addr: source_addr,
-    //         schedule_time: "",
-    //         encoding: 0,
-    //         message: message,
-    //         recipients: [
-    //           {
-    //             recipient_id: 1,
-    //             dest_addr: "255700000001",
-    //           },
-    //         ],
-    //       },
-    //       {
-    //         headers: {
-    //           "Content-Type": content_type,
-    //           Authorization: "Basic " + btoa(api_key + ":" + secret_key),
-    //         },
-    //         httpsAgent: new https.Agent({
-    //           rejectUnauthorized: false,
-    //         }),
-    //       }
-    //     )
-    //     .then((response) => console.log(response, api_key + ":" + secret_key))
-    //     .catch((error) => console.error(error.response.data));
-    // }
+    function send_sms() {
+      axios
+        .post(
+          "https://apisms.beem.africa/v1/send",
+          {
+            source_addr: source_addr,
+            schedule_time: "",
+            encoding: 0,
+            message: message,
+            recipients: [
+              {
+                recipient_id: 1,
+                dest_addr: "255754219549",
+              },
+            ],
+          },
+          {
+            headers: {
+              "Content-Type": content_type,
+              Authorization: "Basic " + btoa(api_key + ":" + secret_key),
+            },
+            httpsAgent: new https.Agent({
+              rejectUnauthorized: false,
+            }),
+          }
+        )
+        .then((response) => console.log(response, api_key + ":" + secret_key))
+        .catch((error) => console.error(error.response.data));
+    }
 
-    // send_sms();
+    send_sms();
 
     // Mock implementation
     console.log(`📨 Sending SMS to ${phone}: "${message}"`);
