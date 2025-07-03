@@ -207,7 +207,7 @@ app.post("/api/notify", async (req, res) => {
             recipients: [
               {
                 recipient_id: 1,
-                dest_addr: "255754219549",
+                dest_addr: "+255754219549",
               },
             ],
           },
