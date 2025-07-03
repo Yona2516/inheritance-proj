@@ -192,8 +192,7 @@ app.post("/api/notify", async (req, res) => {
       from: "INHERITANCE",
     });
     res.json({ success: true, response });
-
-    console.log(phone, message);
+    console.log(response);
 
     function send_sms() {
       axios
