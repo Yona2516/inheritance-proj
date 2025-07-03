@@ -196,7 +196,7 @@ app.post("/api/notify", async (req, res) => {
     const response = await axios.post(
       "https://apisms.beem.africa/v1/send",
       {
-        source_addr: "BEEM", // Use approved sender ID
+        source_addr: "Urithi", // Use approved sender ID
         schedule_time: "",
         encoding: 0,
         message: message,
