@@ -9,7 +9,13 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
-app.use(cors());
+// Fix CORS - Allow all origins for now (you can restrict later)
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -133,10 +139,15 @@ app.post('/api/notify', (req, res) => {
   res.json({ success: true, message: 'Mock SMS sent (no real API call).' });
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+// Add a simple test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!', timestamp: new Date() });
 });
 
-// theer
+// Start the server - Listen on all interfaces
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server running on http://145.223.98.156:${PORT}`);
+  console.log(`🌐 API available at: http://145.223.98.156:${PORT}/api/`);
+  console.log(`🧪 Test endpoint: http://145.223.98.156:${PORT}/api/test`);
+});

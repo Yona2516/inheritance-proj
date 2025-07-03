@@ -156,14 +156,14 @@ form.addEventListener('submit', async function (e) {
       password: formData.get("password"),
     };
 
-    response = await fetch('http://145.223.98.156/api/update-beneficiary', {
+    response = await fetch('http://145.223.98.156:3000/api/update-beneficiary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
   } else {
     // Register new beneficiary
-    response = await fetch('http://145.223.98.156/api/register', {
+    response = await fetch('http://145.223.98.156:3000/api/register', {
       method: 'POST',
       body: formData
     });

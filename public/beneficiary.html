@@ -115,7 +115,7 @@
       }
 
       try {
-        const res = await fetch("http://145.223.98.156/api/beneficiary-login", {
+        const res = await fetch("http://145.223.98.156:3000/api/beneficiary-login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
@@ -159,7 +159,7 @@
       const pdfViewer = document.getElementById("pdfViewer");
 
       if (input === loggedInUser.username) {
-        const pdfUrl = `http://145.223.98.156/uploads/${loggedInUser.will_pdf}`;
+        const pdfUrl = `http://145.223.98.156:3000/uploads/${loggedInUser.will_pdf}`;
         pdfViewer.src = pdfUrl;
         pdfViewer.style.display = "block";
         confirmError.textContent = "";
