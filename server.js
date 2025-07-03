@@ -29,7 +29,7 @@ const upload = multer({ storage });
 // ============ ROUTES ============ //
 
 // Get all beneficiaries
-app.get(`${":3000"}/api/beneficiaries`, async (req, res) => {
+app.get(`/api/beneficiaries`, async (req, res) => {
   try {
     const [results] = await db.query('SELECT * FROM beneficiaries ORDER BY id DESC');
     res.json(results);
