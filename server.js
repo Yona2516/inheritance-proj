@@ -185,14 +185,14 @@ app.post("/api/notify", async (req, res) => {
     const { phone, message } = req.body;
 
     // Uncomment and configure if using Beem SDK
-    /*
+
     const response = await beem.sendSMS({
       to: phone,
       message,
-      from: "INHERITANCE"
+      from: "INHERITANCE",
     });
     res.json({ success: true, response });
-    */
+
     console.log(phone, message);
 
     function send_sms() {
