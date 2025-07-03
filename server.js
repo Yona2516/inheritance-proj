@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const db = require('./db');
 const dotenv = require('dotenv');
-const Beem = require('beem'); // Uncomment if using Beem SMS SDK
+// const Beem = require('beem'); // Uncomment if using Beem SMS SDK
 
 dotenv.config();
 const app = express();
@@ -163,14 +163,14 @@ app.post('/api/notify', async (req, res) => {
     const { phone, message } = req.body;
 
     // Uncomment and configure if using Beem SDK
-    
-    const response = await Beem.sendSMS({
+    /*
+    const response = await beem.sendSMS({
       to: phone,
       message,
       from: "INHERITANCE"
     });
     res.json({ success: true, response });
-    
+    */
 
     // Mock implementation
     console.log(`📨 Sending SMS to ${phone}: "${message}"`);
