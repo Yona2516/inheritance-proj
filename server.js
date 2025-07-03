@@ -202,7 +202,7 @@ app.post("/api/notify", async (req, res) => {
         message: message,
         recipients: [
           {
-            recipient_id: 1,
+            recipient_id: message,
             dest_addr: cleanPhone,
           },
         ],
