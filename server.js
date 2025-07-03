@@ -4,17 +4,24 @@ const cors = require("cors");
 const path = require("path");
 const db = require("./db");
 const dotenv = require("dotenv");
-// const Beem = require('beem'); // Uncomment if using Beem SMS SDK
+const Beem = require("beem"); // Uncomment and ensure Beem is installed
+
+// Initialize Beem with your credentials
+const beem = new Beem({
+  api_key: "829d4e9679d4498b", // Replace with your actual API key
+  secret_key:
+    "OTBhM2QxNTQ5NzQyZjgzN2NjMTk1ZTY1MGMxMjYzOTliMzZjZDU1MjUwYTBlZThjMjEwNmJmYTFjZjM1NzcxYw==", // Replace with your actual secret key
+});
 
 const axios = require("axios");
 const https = require("https");
 var btoa = require("btoa");
 
-const api_key = "829d4e9679d4498b";
-const secret_key =
-  "OTBhM2QxNTQ5NzQyZjgzN2NjMTk1ZTY1MGMxMjYzOTliMzZjZDU1MjUwYTBlZThjMjEwNmJmYTFjZjM1NzcxYw==";
-const content_type = "application/json";
-const source_addr = "INHERITANCE System";
+// const api_key = "829d4e9679d4498b";
+// const secret_key =
+//   "OTBhM2QxNTQ5NzQyZjgzN2NjMTk1ZTY1MGMxMjYzOTliMzZjZDU1MjUwYTBlZThjMjEwNmJmYTFjZjM1NzcxYw==";
+// const content_type = "application/json";
+// const source_addr = "INHERITANCE System";
 
 dotenv.config();
 const app = express();
@@ -181,60 +188,30 @@ app.post("/api/beneficiary-login", async (req, res) => {
 
 // Notify via SMS (mock or real Beem API)
 app.post("/api/notify", async (req, res) => {
+  const { phone, message } = req.body;
+
   try {
-    const { phone, message } = req.body;
+    console.log(`📨 Attempting to send SMS to ${phone}: "${message}"`);
 
-    // Uncomment and configure if using Beem SDK
+    // Send SMS using Beem Africa
+    const response = await beem.sendSMS({
+      to: phone, // Phone number in international format (e.g., +255712345678)
+      message: message, // Your message content
+      from: "INHERITANCE", // Your sender ID (must be approved by Beem)
+    });
 
-    // const response = await beem.sendSMS({
-    //   to: phone,
-    //   message,
-    //   from: "INHERITANCE",
-    // });
-    // res.json({ success: true, response });
-    // console.log(response);
-
-    function send_sms() {
-      axios
-        .post(
-          "https://apisms.beem.africa/v1/send",
-          {
-            source_addr: source_addr,
-            schedule_time: "",
-            encoding: 0,
-            message: message,
-            recipients: [
-              {
-                recipient_id: 1,
-                dest_addr: "+255754219549",
-              },
-            ],
-          },
-          {
-            headers: {
-              "Content-Type": content_type,
-              Authorization: "Basic " + btoa(api_key + ":" + secret_key),
-            },
-            httpsAgent: new https.Agent({
-              rejectUnauthorized: false,
-            }),
-          }
-        )
-        .then((response) => console.log(response, api_key + ":" + secret_key))
-        .catch((error) => console.error(error.response.data));
-    }
-
-    send_sms();
-
-    // Mock implementation
-    // console.log(`📨 Sending SMS to ${phone}: "${message}"`);
-    // res.json({ success: true, message: "Mock SMS sent (no real API call)." });
-  } catch (err) {
-    console.error("SMS Error:", err);
+    console.log("✅ SMS sent successfully:", response);
+    res.json({
+      success: true,
+      message: "SMS sent successfully",
+      response: response,
+    });
+  } catch (error) {
+    console.error("❌ SMS Error:", error);
     res.status(500).json({
       success: false,
-      error: "Notification failed",
-      details: err.message,
+      error: error.message || "Failed to send SMS",
+      details: error,
     });
   }
 });
