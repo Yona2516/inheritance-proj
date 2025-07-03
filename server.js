@@ -4,10 +4,6 @@ const cors = require("cors");
 const path = require("path");
 const db = require("./db");
 const dotenv = require("dotenv");
-const Beem = require("beem"); // Uncomment and ensure Beem is installed
-
-// Initialize Beem with your credentials
-// Beem Africa Configuration
 
 const axios = require("axios");
 const https = require("https");
@@ -187,23 +183,27 @@ app.post("/api/notify", async (req, res) => {
   const { phone, message } = req.body;
 
   try {
-    console.log(`📨 Attempting to send SMS to ${phone}: "${message}"`);
+    // Clean and validate phone number
+    let cleanPhone = phone.replace(/^\+/, "").replace(/\s+/g, "");
 
-    // Ensure phone number is in correct format (remove + if present)
-    const cleanPhone = phone.replace(/^\+/, "");
+    // Ensure Tanzania format
+    if (cleanPhone.startsWith("0")) {
+      cleanPhone = "255" + cleanPhone.substring(1);
+    }
 
-    // Send SMS using Beem Africa API
+    console.log(`📨 Sending SMS to ${cleanPhone}: "${message}"`);
+
     const response = await axios.post(
       "https://apisms.beem.africa/v1/send",
       {
-        source_addr: source_addr,
+        source_addr: "BEEM", // Use approved sender ID
         schedule_time: "",
         encoding: 0,
         message: message,
         recipients: [
           {
             recipient_id: 1,
-            dest_addr: phone, // Phone number without + prefix
+            dest_addr: cleanPhone,
           },
         ],
       },
@@ -218,12 +218,30 @@ app.post("/api/notify", async (req, res) => {
       }
     );
 
-    console.log("✅ SMS sent successfully:", response.data);
-    res.json({
-      success: true,
-      message: "SMS sent successfully",
-      response: response.data,
-    });
+    // Log full response for debugging
+    console.log(
+      "📋 Full Beem Response:",
+      JSON.stringify(response.data, null, 2)
+    );
+
+    // Check for actual success indicators
+    if (response.data && response.data.successful === true) {
+      console.log("✅ SMS sent successfully");
+      res.json({
+        success: true,
+        message: "SMS sent successfully",
+        response: response.data,
+        phone: cleanPhone,
+      });
+    } else {
+      console.log("⚠️ SMS may not have been delivered:", response.data);
+      res.json({
+        success: false,
+        message: "SMS sent but delivery uncertain",
+        response: response.data,
+        phone: cleanPhone,
+      });
+    }
   } catch (error) {
     console.error("❌ SMS Error:", error.response?.data || error.message);
     res.status(500).json({
@@ -233,7 +251,6 @@ app.post("/api/notify", async (req, res) => {
     });
   }
 });
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
